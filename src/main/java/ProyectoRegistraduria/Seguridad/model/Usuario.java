@@ -13,16 +13,16 @@ public class Usuario {
     private String _id;
 
     private String nombre_usuario;
-    private String correo;
+    private String email;
     private String contrasena;
 
     @DBRef
     private Rol rol;
 
-    public Usuario(String nombre_usuario, String correo, String contrasena)
+    public Usuario(String nombre_usuario, String email, String contrasena)
     {
         this.nombre_usuario = nombre_usuario;
-        this.correo = correo;
+        this.email = email;
         this.contrasena = contrasena;
     }
 }
