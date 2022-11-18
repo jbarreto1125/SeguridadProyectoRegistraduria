@@ -9,6 +9,8 @@ import ProyectoRegistraduria.Seguridad.repository.RolRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,6 +28,7 @@ public class PermisoRolController {
 
     @GetMapping("")
     public List<PermisoRol> index() {
+
         return this.permisoRolRepo.findAll();
     }
 
@@ -67,7 +70,43 @@ public class PermisoRolController {
 
     @DeleteMapping("{id}")
     public void delete(@PathVariable String id){
+
         this.permisoRolRepo.deleteById(id);
     }
 
-}
+    @PostMapping("/validar-permiso/rol/{id_rol}")
+    public PermisoRol getPermiso(@PathVariable String id_rol, @RequestBody Permiso infoPermiso,
+                                 final HttpServletResponse response) throws IOException {
+        Optional<Permiso> opt = this.permisoRepo.findByUrlAndMetodo(infoPermiso.getUrl(), infoPermiso.getMetodo());
+        if(opt.isEmpty())
+        {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+            return null;
+
+        }
+        Permiso p = opt.get();
+
+        Optional<Rol> optRol = this.rolRepo.findById(id_rol);
+        if(optRol.isEmpty())
+        {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+            return null;
+        }
+        Rol r = optRol.get();
+
+        Optional<PermisoRol> optPermisoRol = this.permisoRolRepo.findByRolAndPermiso(r, p);
+
+        if(optPermisoRol.isEmpty())
+        {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+            return null;
+        }
+        return optPermisoRol.get();
+
+    }
+
+
+    }
+
+
+
